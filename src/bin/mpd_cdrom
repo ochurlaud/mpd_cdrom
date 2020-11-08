@@ -1,0 +1,46 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: $0 [load|unload]"
+    exit $1
+}
+
+mpd_load() {
+    nbtracks=$(cdparanoia -sQ |& grep -P "^\s+\d+\." | wc -l)
+
+    for ((i=1; i<=${nbtracks};i++)) ; do
+        mpc add cdda:///${i}
+    done
+}
+
+mpd_unload() {
+    positions=$(mpc playlist | grep -n "cdda:///" | cut -d':' -f1)
+    if [[ "${positions}" != "" ]] ; then
+        mpc del ${positions}
+    fi
+}
+
+control_dependencies() {
+    which $1 > /dev/null
+    if [[ "$?" -ne "0" ]]; then
+        echo "[ERROR] $1 is not installed"
+        exit 2
+    fi
+}
+
+for dependency in "mpc" "cdparanoia"; do
+    control_dependencies ${dependency}
+done
+
+if [[ "$#" -ne "1" ]] ; then
+    usage 1
+fi
+
+if [[ "$1" = "load" ]] ; then
+    mpd_load
+elif [[ "$1" = "unload" ]] ; then
+    mpd_unload
+else
+    usage 1
+fi
+

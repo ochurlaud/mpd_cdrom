@@ -1,0 +1,2 @@
+ACTION=="change", SUBSYSTEM=="block", KERNEL=="sr*", ENV{DISK_EJECT_REQUEST}=="", TAG+="systemd", ENV{SYSTEMD_WANTS}="mpd-load-cdrom.service"
+ACTION=="change", SUBSYSTEM=="block", KERNEL=="sr*", ENV{DISK_EJECT_REQUEST}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="mpd-unload-cdrom.service"
